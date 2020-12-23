@@ -20,7 +20,7 @@ interface DataProp {
 }
 
 export default defineComponent({
-  name: 'ref',
+  name: 'reactive',
   setup() {
     // reactive 接受一个普通对象 然后返回该普通对象的响应式代理
     // 响应式转换是“深层的”：会影响对象内部所有嵌套的属性
