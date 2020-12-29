@@ -28,7 +28,7 @@ export default defineComponent({
     list: {
       // 当需要把props的类型断言时  可以使用 PropType
       type: Array as PropType<ColumnProps[]>,
-      require: true
+      required: true
     }
   },
   setup (props) {
