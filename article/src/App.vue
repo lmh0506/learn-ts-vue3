@@ -2,15 +2,20 @@
   <div class="container">
     <GlobalHeader :user="user"></GlobalHeader>
     <ColumnList :list="list"></ColumnList>
-    <ValidateInput :rules="rules"></ValidateInput>
+    <ValidateForm @form-submit="handleFormSubmit" ref="formRef">
+      <ValidateInput :rules="rules"></ValidateInput>
+      <ValidateInput :rules="rules"></ValidateInput>
+      <button @click.prevent="reset">reset</button>
+    </ValidateForm>
   </div>
 </template>
 
 <script lang='ts'>
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 import ColumnList, { ColumnProps } from '@/components/ColumnList.vue'
 import GlobalHeader, { UserProps } from '@/components/GlobalHeader.vue'
 import ValidateInput, { RulesProp } from '@/components/ValidateInput.vue'
+import ValidateForm from '@/components/ValidateForm.vue'
 const testData: ColumnProps[] = [
   {
     id: 1,
@@ -61,13 +66,26 @@ export default defineComponent({
   components: {
     ColumnList,
     GlobalHeader,
-    ValidateInput
+    ValidateInput,
+    ValidateForm
   },
   setup () {
+    const handleFormSubmit = (val: boolean) => {
+      console.log(val)
+    }
+
+    const formRef = ref()
+    const reset = () => {
+      formRef.value.resetForm()
+    }
+
     return {
       list: testData,
       user,
-      rules
+      rules,
+      handleFormSubmit,
+      reset,
+      formRef
     }
   }
 })

@@ -13,10 +13,22 @@
 
 <script lang='ts'>
 import { defineComponent, PropType, reactive } from 'vue'
+import { emitter } from './ValidateForm.vue'
 const emailReg = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 interface RuleProp {
   type: 'required' | 'email';
   message: string;
+}
+
+export interface InputRef {
+  val: any;
+  error: boolean;
+  message: string;
+}
+
+export interface EmitData {
+  validateInput: () => boolean;
+  inputRef: InputRef;
 }
 
 export type RulesProp = RuleProp[]
@@ -35,7 +47,7 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const inputRef = reactive({
+    const inputRef = reactive<InputRef>({
       val: props.modelValue,
       error: false,
       message: ''
@@ -65,8 +77,15 @@ export default defineComponent({
           return passed
         })
         inputRef.error = !allPassed
+        return allPassed
       }
+      return true
     }
+    const EmitData: EmitData = {
+      validateInput,
+      inputRef
+    }
+    emitter.emit('form-item-create', EmitData)
 
     return {
       inputRef,
