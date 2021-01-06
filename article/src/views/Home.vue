@@ -24,35 +24,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import ColumnList, { ColumnProps } from '@/components/ColumnList.vue'
-const testData: ColumnProps[] = [
-  {
-    id: 1,
-    title: '12',
-    description: '2q3423432'
-  },
-  {
-    id: 2,
-    title: '12',
-    description: '2q3423432'
-  },
-  {
-    id: 3,
-    title: '12',
-    description: '2q3423432'
-  },
-  {
-    id: 4,
-    title: '12',
-    description: '2q3423432'
-  },
-  {
-    id: 5,
-    title: '12',
-    description: '2q3423432'
-  }
-]
+import { defineComponent, computed } from 'vue'
+import ColumnList from '@/components/ColumnList.vue'
+import { useStore } from 'vuex'
+import { GlobalDataProps } from '@/store/index'
 
 export default defineComponent({
   name: 'Home',
@@ -60,8 +35,10 @@ export default defineComponent({
     ColumnList
   },
   setup () {
+    const store = useStore<GlobalDataProps>()
+    const list = computed(() => store.state.columns)
     return {
-      list: testData
+      list
     }
   }
 })

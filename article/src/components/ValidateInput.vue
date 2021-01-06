@@ -1,12 +1,21 @@
 <template>
   <div class="validate-input-container pb-3">
     <input
+      v-if="tag === 'input'"
       class="form-control"
       :class="{'is-invalid': inputRef.error}"
       :value="inputRef.val"
       @input="updateValue"
       @blur="validateInput"
-      v-bind="$attrs">
+      v-bind="$attrs" />
+    <textarea
+      v-else
+      class="form-control"
+      :class="{'is-invalid': inputRef.error}"
+      :value="inputRef.val"
+      @input="updateValue"
+      @blur="validateInput"
+      v-bind="$attrs" />
       <span v-if="inputRef.error" class="invalid-feedback">{{inputRef.message}}</span>
   </div>
 </template>
@@ -33,6 +42,8 @@ export interface EmitData {
 
 export type RulesProp = RuleProp[]
 
+export type TagType = 'input' | 'textarea'
+
 export default defineComponent({
   name: 'ValidateInput',
   // 拒绝组件根元素继承attribute
@@ -44,6 +55,10 @@ export default defineComponent({
     modelValue: {
       type: String,
       default: ''
+    },
+    tag: {
+      type: String as PropType<TagType>,
+      default: 'input'
     }
   },
   setup (props, context) {

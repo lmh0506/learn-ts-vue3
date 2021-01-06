@@ -13,13 +13,13 @@
       <li class="list-inline-item">
         <Dropdown :title="`你好 ${user.name}`">
           <DropdownItem>
-            <a class="dropdown-item" href="#">新建文章</a>
+            <router-link to="/create" class="dropdown-item">新建文章</router-link>
           </DropdownItem>
           <DropdownItem>
             <a class="dropdown-item" href="#">编辑资料</a>
           </DropdownItem>
-          <DropdownItem disabled>
-            <a class="dropdown-item" href="#">退出登录</a>
+          <DropdownItem>
+            <div class="dropdown-item" @click="logout">退出登录</div>
           </DropdownItem>
         </Dropdown>
       </li>
@@ -30,12 +30,9 @@
 <script lang='ts'>
 import Dropdown from './Dropdown.vue'
 import DropdownItem from './DropdownItem.vue'
-import { defineComponent, PropType } from 'vue'
-export interface UserProps {
-  isLogin: boolean;
-  name?: string;
-  id: number;
-}
+import { defineComponent, computed } from 'vue'
+import { GlobalDataProps } from '@/store/index'
+import { useStore } from 'vuex'
 
 export default defineComponent({
   name: 'GlobalHeader',
@@ -43,10 +40,14 @@ export default defineComponent({
     Dropdown,
     DropdownItem
   },
-  props: {
-    user: {
-      type: Object as PropType<UserProps>,
-      required: true
+  setup () {
+    const store = useStore<GlobalDataProps>()
+    const user = computed(() => store.state.user)
+    const logout = () => store.commit('logout')
+
+    return {
+      user,
+      logout
     }
   }
 })

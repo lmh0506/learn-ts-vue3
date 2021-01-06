@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <GlobalHeader :user="user"></GlobalHeader>
+    <GlobalHeader></GlobalHeader>
     <router-view></router-view>
     <footer class="text-center py-4 text-secondary bg-light mt-6">
       <small>
@@ -17,22 +17,12 @@
 
 <script lang='ts'>
 import { defineComponent } from 'vue'
-import GlobalHeader, { UserProps } from '@/components/GlobalHeader.vue'
-const user: UserProps = {
-  id: 1,
-  name: '123',
-  isLogin: false
-}
+import GlobalHeader from '@/components/GlobalHeader.vue'
 
 export default defineComponent({
   name: 'App',
   components: {
     GlobalHeader
-  },
-  setup () {
-    return {
-      user
-    }
   }
 })
 </script>
