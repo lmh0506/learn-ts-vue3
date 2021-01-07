@@ -1,5 +1,28 @@
 import { createStore } from 'vuex'
-import { testData, testPosts, ColumnProps, PostProps } from '../../testData'
+import axios from 'axios'
+
+export interface ImageProps {
+  _id?: string;
+  url?: string;
+  createdAt?: string;
+}
+
+export interface PostProps {
+  _id: string;
+  title: string;
+  content?: string;
+  excerpt?: string;
+  image?: ImageProps;
+  createdAt: string;
+  column: string;
+}
+
+export interface ColumnProps {
+  _id: string;
+  title: string;
+  avatar?: ImageProps;
+  description: string;
+}
 
 interface UserProps {
   isLogin: boolean;
@@ -16,19 +39,13 @@ export interface GlobalDataProps {
 
 export default createStore<GlobalDataProps>({
   state: {
-    columns: testData,
-    posts: testPosts,
+    columns: [],
+    posts: [],
     user: { id: 1, name: '张三', columnId: 1, isLogin: true }
   },
   getters: {
-    biggerColumnsLen (state) {
-      return state.columns.filter(item => item.id > 2)
-    },
-    getColumnById: (state) => (id: number) => {
-      return state.columns.find(c => c.id === id)
-    },
-    getPostsById: (state) => (id: number) => {
-      return state.posts.filter(post => post.columnId === id)
+    getPostsById: (state) => (id: string) => {
+      return state.posts.filter(post => post.column === id)
     }
   },
   mutations: {
@@ -40,9 +57,17 @@ export default createStore<GlobalDataProps>({
     },
     createPost (state, newPost: PostProps) {
       state.posts.push(newPost)
+    },
+    fetchColumns (state, rawData) {
+      state.columns = rawData
     }
   },
   actions: {
+    fetchColumns (context) {
+      axios.get('/api/columns').then(res => {
+        context.commit('fetchColumns', res.data.data.list)
+      })
+    }
   },
   modules: {
   }

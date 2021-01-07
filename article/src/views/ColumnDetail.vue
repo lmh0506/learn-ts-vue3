@@ -2,7 +2,7 @@
   <div class="column-detail-page w-75 mx-auto">
     <div class="column-info row mb-4 border-bottom pb-4 align-items-center" v-if="column">
       <div class="col-3 text-center">
-        <img :src="column.avatar && column.avatar" :alt="column.title" class="rounded-circle border w-100">
+        <img :src="column.avatar && column.avatar.url" :alt="column.title" class="rounded-circle border w-100">
       </div>
       <div class="col-9">
         <h4>{{column.title}}</h4>
@@ -14,11 +14,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import PostList from '@/components/PostList.vue'
-import { useStore } from 'vuex'
-import { GlobalDataProps } from '@/store'
+import { ColumnProps, PostProps } from '@/store'
+import axios from 'axios'
 
 export default defineComponent({
   components: {
@@ -26,10 +26,18 @@ export default defineComponent({
   },
   setup () {
     const route = useRoute()
-    const store = useStore<GlobalDataProps>()
-    const currentId = +route.params.id
-    const column = computed(() => store.getters.getColumnById(currentId))
-    const list = computed(() => store.getters.getPostsById(currentId))
+    const currentId = route.params.id
+    const column = ref<ColumnProps>()
+    const list = ref<PostProps>()
+
+    axios.get('/api/columns/' + currentId).then(res => {
+      column.value = res.data.data
+    })
+
+    axios.get('/api/columns/' + currentId + '/posts').then(res => {
+      list.value = res.data.data.list
+    })
+
     return {
       column,
       list
