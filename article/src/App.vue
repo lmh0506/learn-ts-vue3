@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <Loading v-if="loading" text="拼命加载中"></Loading>
     <GlobalHeader></GlobalHeader>
     <router-view></router-view>
     <footer class="text-center py-4 text-secondary bg-light mt-6">
@@ -16,13 +17,23 @@
 </template>
 
 <script lang='ts'>
-import { defineComponent } from 'vue'
+import { computed, defineComponent } from 'vue'
 import GlobalHeader from '@/components/GlobalHeader.vue'
+import Loading from '@/components/Loading.vue'
+import { useStore } from 'vuex'
 
 export default defineComponent({
   name: 'App',
   components: {
-    GlobalHeader
+    GlobalHeader,
+    Loading
+  },
+  setup () {
+    const store = useStore()
+    const loading = computed(() => store.state.loading)
+    return {
+      loading
+    }
   }
 })
 </script>

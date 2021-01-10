@@ -32,6 +32,7 @@ interface UserProps {
 }
 
 export interface GlobalDataProps {
+  loading: boolean;
   columns: ColumnProps[];
   posts: PostProps[];
   user: UserProps;
@@ -39,6 +40,7 @@ export interface GlobalDataProps {
 
 export default createStore<GlobalDataProps>({
   state: {
+    loading: false,
     columns: [],
     posts: [],
     user: { id: 1, name: '张三', columnId: 1, isLogin: true }
@@ -60,13 +62,15 @@ export default createStore<GlobalDataProps>({
     },
     fetchColumns (state, rawData) {
       state.columns = rawData
+    },
+    setLoading (state, loading) {
+      state.loading = loading
     }
   },
   actions: {
-    fetchColumns (context) {
-      axios.get('/api/columns').then(res => {
-        context.commit('fetchColumns', res.data.data.list)
-      })
+    async fetchColumns (context) {
+      const { data } = await axios.get('/api/columns')
+      context.commit('fetchColumns', data.list)
     }
   },
   modules: {

@@ -28,14 +28,14 @@ export default defineComponent({
     const route = useRoute()
     const currentId = route.params.id
     const column = ref<ColumnProps>()
-    const list = ref<PostProps>()
+    const list = ref<PostProps[]>([])
 
     axios.get('/api/columns/' + currentId).then(res => {
-      column.value = res.data.data
+      column.value = res.data
     })
 
     axios.get('/api/columns/' + currentId + '/posts').then(res => {
-      list.value = res.data.data.list
+      list.value = res.data.list
     })
 
     return {
