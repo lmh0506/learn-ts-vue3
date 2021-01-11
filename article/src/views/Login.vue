@@ -65,9 +65,9 @@ export default defineComponent({
 
     const handleFormSubmit = (val: boolean) => {
       if (val) {
-        store.commit('login', {
-          id: 1,
-          name: '张三'
+        store.dispatch('login', {
+          email: emailVal.value,
+          password: passwordVal.value
         })
         router.push('/')
       }

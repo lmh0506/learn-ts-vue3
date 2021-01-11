@@ -89,9 +89,9 @@ export default defineComponent({
           content: contentVal,
           image: 'http://vue-maker.oss-cn-hangzhou.aliyuncs.com/vue-marker/5ee1980819f4ae08ac78d458.png?x-oss-process=image/resize,m_fill,m_pad,w_200,h_110',
           createdAt: new Date().toLocaleString(),
-          columnId: user.columnId
+          columnId: user.column
         })
-        router.push('/column/' + user.columnId)
+        router.push('/column/' + user.column)
       }
     }
 
