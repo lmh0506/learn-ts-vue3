@@ -6,7 +6,7 @@
         <router-link to="/login" class="btn btn-outline-light my-2">登录</router-link>
       </li>
       <li class="list-inline-item">
-        <a href="#" class="btn btn-outline-light my-2">注册</a>
+        <router-link to="/Signup" class="btn btn-outline-light my-2">注册</router-link>
       </li>
     </ul>
     <ul v-else class="list-inline mb-0">
@@ -43,7 +43,11 @@ export default defineComponent({
   setup () {
     const store = useStore<GlobalDataProps>()
     const user = computed(() => store.state.user)
-    const logout = () => store.commit('logout')
+    const logout = () => {
+      store.commit('logout')
+      store.commit('setToken', '')
+      store.commit('setUser', {})
+    }
 
     return {
       user,

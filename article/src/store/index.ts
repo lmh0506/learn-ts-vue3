@@ -34,7 +34,13 @@ interface UserProps {
   avatar?: ImageProps;
 }
 
+export interface GlobalErrorProps {
+  status: boolean;
+  message?: string;
+}
+
 export interface GlobalDataProps {
+  error: GlobalErrorProps;
   token: string;
   loading: boolean;
   columns: ColumnProps[];
@@ -44,6 +50,7 @@ export interface GlobalDataProps {
 
 export default createStore<GlobalDataProps>({
   state: {
+    error: { status: false },
     token: localStorage.getItem('article_token') || '',
     loading: false,
     columns: [],
@@ -61,12 +68,19 @@ export default createStore<GlobalDataProps>({
     },
     setToken (state, token) {
       localStorage.setItem('article_token', token)
+      axios.defaults.headers.common.Authorization = 'Bearer ' + token
       state.token = token
     },
     setUser (state, user) {
-      const data = { ...user, isLogin: true }
+      const data = { ...user }
+      if (data._id) {
+        data.isLogin = true
+      }
       localStorage.setItem('article_user', JSON.stringify(data))
       state.user = data
+    },
+    setError (state, e: GlobalErrorProps) {
+      state.error = e
     },
     createPost (state, newPost: PostProps) {
       state.posts.push(newPost)
@@ -85,9 +99,11 @@ export default createStore<GlobalDataProps>({
     },
     async login ({ commit, dispatch }, payload) {
       const { data } = await axios.post('/api/user/login', payload)
-      axios.defaults.headers.common.Authorization = 'Bearer ' + data.token
       commit('setToken', data.token)
       dispatch('getCurrentUser')
+    },
+    async signUp (context, payload) {
+      await axios.post('/api/users', payload)
     },
     async getCurrentUser ({ commit }) {
       const { data } = await axios.get('/api/user/current')

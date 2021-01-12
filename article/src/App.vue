@@ -17,10 +17,11 @@
 </template>
 
 <script lang='ts'>
-import { computed, defineComponent } from 'vue'
+import { computed, defineComponent, watch } from 'vue'
 import GlobalHeader from '@/components/GlobalHeader.vue'
 import Loading from '@/components/Loading.vue'
 import { useStore } from 'vuex'
+import createMessage from '@/components/createMessage'
 
 export default defineComponent({
   name: 'App',
@@ -31,8 +32,18 @@ export default defineComponent({
   setup () {
     const store = useStore()
     const loading = computed(() => store.state.loading)
+    const error = computed(() => store.state.error)
+
+    watch(error, (val) => {
+      const { status, message } = val
+      console.log(val)
+      if (status && message) {
+        createMessage(message, 'error')
+      }
+    })
     return {
-      loading
+      loading,
+      error
     }
   }
 })

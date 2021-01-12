@@ -10,7 +10,8 @@
 </template>
 
 <script lang='ts'>
-import { defineComponent, onUnmounted } from 'vue'
+import { defineComponent } from 'vue'
+import useDomCreate from '@/hooks/useDomCreate'
 
 export default defineComponent({
   name: 'Loading',
@@ -23,13 +24,7 @@ export default defineComponent({
     }
   },
   setup () {
-    const node = document.createElement('div')
-    node.id = 'loading-wrapper'
-    document.body.append(node)
-
-    onUnmounted(() => {
-      document.body.removeChild(node)
-    })
+    useDomCreate('loading-wrapper')
   }
 })
 </script>
