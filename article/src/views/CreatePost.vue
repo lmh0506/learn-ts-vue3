@@ -1,29 +1,27 @@
 <template>
   <div class="create-post-page">
     <h4>{{'新建文章'}}</h4>
-    <!-- <uploader
-      action="/upload"
-      :beforeUpload="uploadCheck"
-      @file-uploaded="handleFileUploaded"
-      :uploaded="uploadedData"
+    <uploader
+      :beforeUpload="beforeUpload"
+      @file-uploaded="onFileUploaded"
       class="d-flex align-items-center justify-content-center bg-light text-secondary w-100 my-4"
     >
       <h2>点击上传头图</h2>
       <template #loading>
         <div class="d-flex">
           <div class="spinner-border text-secondary" role="status">
-            <span class="sr-only">Loading...</span>
+            <span class="sr-only"></span>
           </div>
           <h2>正在上传</h2>
         </div>
       </template>
       <template #uploaded="dataProps">
         <div class="uploaded-area">
-          <img :src="dataProps.uploadedData.data.url">
+          <img :src="dataProps.uploadData.url">
           <h3>点击重新上传</h3>
         </div>
       </template>
-    </uploader> -->
+    </uploader>
     <validate-form @form-submit="onFormSubmit">
       <div class="mb-3">
         <label class="form-label">文章标题：</label>
@@ -53,22 +51,26 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import { useStore } from 'vuex'
-import { useRouter, useRoute } from 'vue-router'
-import { GlobalDataProps } from '../store'
+import { useRouter } from 'vue-router'
+import { GlobalDataProps, ResponseType, ImageProps } from '../store'
 import ValidateInput, { RulesProp } from '../components/ValidateInput.vue'
 import ValidateForm from '../components/ValidateForm.vue'
-// import Uploader from '../components/Uploader.vue'
+import Uploader from '../components/Uploader.vue'
+import createMessage from '@/components/createMessage'
+import { beforeUploadCheck } from '@/utils/helper'
 
 export default defineComponent({
   name: 'CreatePost',
   components: {
     ValidateInput,
-    ValidateForm
+    ValidateForm,
+    Uploader
   },
   setup () {
     const titleVal = ref('')
     const router = useRouter()
-    const route = useRoute()
+    // const route = useRoute()
+    let imageId = ''
 
     const store = useStore<GlobalDataProps>()
 
@@ -81,17 +83,37 @@ export default defineComponent({
     ]
 
     const onFormSubmit = (result: boolean) => {
+      if (!imageId) {
+        createMessage('请先上传图片', 'error')
+      }
       if (result) {
         const user = store.state.user
-        store.commit('createPost', {
-          id: Math.random(),
-          title: titleVal,
-          content: contentVal,
-          image: 'http://vue-maker.oss-cn-hangzhou.aliyuncs.com/vue-marker/5ee1980819f4ae08ac78d458.png?x-oss-process=image/resize,m_fill,m_pad,w_200,h_110',
-          createdAt: new Date().toLocaleString(),
-          columnId: user.column
+        store.dispatch('createPost', {
+          title: titleVal.value,
+          content: contentVal.value,
+          image: imageId
+        }).then(() => {
+          router.push('/column/' + user.column)
         })
-        router.push('/column/' + user.column)
+      }
+    }
+
+    const beforeUpload = (file: File) => {
+      const result = beforeUploadCheck(file, { format: ['image/jpeg', 'image/png'], size: 1024 * 1024 })
+      const { error, passed } = result
+      if (!passed) {
+        if (error === 'format') {
+          createMessage('图片格式不正确', 'error')
+        } else if (error === 'size') {
+          createMessage('图片大小不能超过1m', 'error')
+        }
+      }
+      return passed
+    }
+
+    const onFileUploaded = (rawData: ResponseType<ImageProps>) => {
+      if (rawData.data._id) {
+        imageId = rawData.data._id
       }
     }
 
@@ -100,7 +122,9 @@ export default defineComponent({
       titleVal,
       contentVal,
       contentRules,
-      onFormSubmit
+      onFormSubmit,
+      beforeUpload,
+      onFileUploaded
     }
   }
 })
@@ -110,6 +134,9 @@ export default defineComponent({
   height: 200px;
   cursor: pointer;
   overflow: hidden;
+}
+.create-post-page .file-upload-container h2{
+  line-height: 200px;
 }
 .create-post-page .file-upload-container img {
   width: 100%;

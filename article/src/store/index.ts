@@ -1,9 +1,16 @@
 import { createStore } from 'vuex'
 import axios from 'axios'
 
+export interface ResponseType<P = {}> {
+  code: number;
+  msg: string;
+  data: P;
+}
+
 export interface ImageProps {
   _id?: string;
   url?: string;
+  fitUrl?: string;
   createdAt?: string;
 }
 
@@ -48,10 +55,13 @@ export interface GlobalDataProps {
   user: UserProps;
 }
 
+const token = localStorage.getItem('article_token') || ''
+axios.defaults.headers.common.Authorization = 'Bearer ' + token
+
 export default createStore<GlobalDataProps>({
   state: {
     error: { status: false },
-    token: localStorage.getItem('article_token') || '',
+    token,
     loading: false,
     columns: [],
     posts: [],
@@ -68,7 +78,6 @@ export default createStore<GlobalDataProps>({
     },
     setToken (state, token) {
       localStorage.setItem('article_token', token)
-      axios.defaults.headers.common.Authorization = 'Bearer ' + token
       state.token = token
     },
     setUser (state, user) {
@@ -108,6 +117,14 @@ export default createStore<GlobalDataProps>({
     async getCurrentUser ({ commit }) {
       const { data } = await axios.get('/api/user/current')
       commit('setUser', data)
+    },
+    async createPost ({ commit, state }, formData) {
+      const { data } = await axios.post('/api/posts', {
+        ...formData,
+        author: state.user._id,
+        column: state.user.column
+      })
+      commit('createPost', data)
     }
   },
   modules: {

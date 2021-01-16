@@ -31,10 +31,12 @@ export default defineComponent({
     const list = ref<PostProps[]>([])
 
     axios.get('/api/columns/' + currentId).then(res => {
+      console.log(res)
       column.value = res.data
     })
 
     axios.get('/api/columns/' + currentId + '/posts').then(res => {
+      console.log(res)
       list.value = res.data.list
     })
 
